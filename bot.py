@@ -8,7 +8,7 @@ import time
 phone = "alice"
 api_id = 25983686
 api_hash = "d49ffa3e2b617c66250b7f4c169d1cb9"
-chance = 2 #шанс ответа
+chance = 7 #шанс ответа
 chance = list(range(chance))
 app = Client(phone, api_id, api_hash)
 ignorechats = {}
@@ -17,8 +17,7 @@ data = f.read()
 f.close()
 msgs = [ms for ms in data.split("\n") if ms]
 ignoreusers = [] #игнор пользователей (айдишники через запятую вставлять внутри квадратных скобок)
-chats = [] #игнор чатов (айдишники через запятую вставлять внутри квадратных скобок)
-
+chats = [-1001816236019] #игнор чатов (айдишники через запятую вставлять внутри квадратных скобок)
 
 @app.on_message(filters.all)
 async def hello(client, message):
@@ -38,8 +37,6 @@ async def hello(client, message):
     except KeyError:
         ignorechats[chat_id] = 0
     ch = random.choice(chance)
-    my_id = await app.get_me()
-    ignoreusers.append(my_id.id)
     if ch == 1 and not bot and message.from_user.id not in ignoreusers and message.from_user.id > 0 and chat_id not in chats:
         if ignorechats[chat_id] < time_now:
             try:
