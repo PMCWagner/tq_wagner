@@ -6,7 +6,7 @@ import time
 import cfg
 
 
-chance = list(range(cfg.chance))
+chance = list(range(1, cfg.chance+1))
 app = Client("alice", cfg.api_id, cfg.api_hash)
 ignorechats = {}
 f = open("words.txt", encoding="utf-8", errors="ignore")
