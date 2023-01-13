@@ -7,7 +7,15 @@ import cfg
 
 
 chance = list(range(1, cfg.chance+1))
-app = Client("alice", cfg.api_id, cfg.api_hash)
+app = Client(
+    name="alice",
+    api_id=cfg.api_id,
+    api_hash=cfg.api_hash,
+    device_model=cfg.device_model,
+    app_version=cfg.app_version,
+    system_version=cfg.system_version,
+    lang_code=cfg.lang_code
+)
 ignorechats = {}
 f = open("words.txt", encoding="utf-8", errors="ignore")
 data = f.read()
