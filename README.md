@@ -1,7 +1,7 @@
 ## БОТ БАЙТЕР | BITE BOT
 
 <picture>
-  <img width=50% height=50% alt="" src="https://i.imgur.com/H2TWotx.jpg">
+  <img width=50% height=50% alt="" src="https://i.imgur.com/kGGLSwb.jpeg">
 </picture>
 <br>
 Подпишись на наш телеграм https://t.me/holey_moon
