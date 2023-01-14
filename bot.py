@@ -1,4 +1,4 @@
-from pyrogram.errors import FloodWait, SlowmodeWait, ChatWriteForbidden, UserBannedInChannel
+from pyrogram.errors import FloodWait, SlowmodeWait, ChatWriteForbidden, UserBannedInChannel, ReactionInvalid
 from pyrogram import Client, filters, enums
 import datetime
 import asyncio
@@ -38,6 +38,7 @@ chats = cfg.chats
 
 @app.on_message(filters.all)
 async def hello(client, message):
+    msg_id = message.id
     user = message.from_user
     if user:
         try:
@@ -71,14 +72,13 @@ async def hello(client, message):
                     write_log(f"От кого: [{u_id}]({username}){first_name}")
                     write_log(f"Сообщение: {msg}")
         if ch == 1 and not bot and message.from_user.id not in ignoreusers and message.from_user.id > 0 and chat_id not in chats:
+            await app.read_chat_history(chat_id)
             if ignorechats[chat_id] < time_now:
                 try:
                     await app.send_chat_action(chat_id, enums.ChatAction.TYPING)
                     await asyncio.sleep(random.randint(3, 5))
                     msg = random.choice(msgs)
-                    msg_id = message.id
                     await app.send_message(chat_id, msg, reply_to_message_id=msg_id)
-                    await app.read_chat_history(chat_id)
                 except SlowmodeWait as e:
                     print(e)
                     ignorechats[chat_id] = time_now+e.value+2
@@ -86,9 +86,21 @@ async def hello(client, message):
                     print(e)
                     ignorechats[chat_id] = time_now+e.value+2
                 except ChatWriteForbidden:
-                    pass
+                    try:
+                        await app.send_reaction(chat_id, msg_id, random.choice(cfg.reactions))
+                    except FloodWait as e:
+                        print(e)
+                        ignorechats[chat_id] = time_now+e.value+20
+                    except:
+                        pass
                 except UserBannedInChannel:
-                    pass
+                    try:
+                        await app.send_reaction(chat_id, msg_id, random.choice(cfg.reactions))
+                    except FloodWait as e:
+                        print(e)
+                        ignorechats[chat_id] = time_now+e.value+20
+                    except:
+                        pass
 
 
 app.run()
