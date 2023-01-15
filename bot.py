@@ -24,7 +24,7 @@ log_path = f"logs/log_{n}.txt"
 def write_log(info):
     print(info)
     f = open(log_path, "at", encoding='utf-8', errors='ignore')
-    f.write(info+"\n")
+    f.write(str(info)+"\n")
     f.close()
 
 ignorechats = {}
@@ -80,27 +80,31 @@ async def hello(client, message):
                     msg = random.choice(msgs)
                     await app.send_message(chat_id, msg, reply_to_message_id=msg_id)
                 except SlowmodeWait as e:
-                    print(e)
+                    write_log(e)
                     ignorechats[chat_id] = time_now+e.value+2
                 except FloodWait as e:
-                    print(e)
+                    write_log(e)
                     ignorechats[chat_id] = time_now+e.value+2
                 except ChatWriteForbidden:
                     try:
                         await app.send_reaction(chat_id, msg_id, random.choice(cfg.reactions))
                     except FloodWait as e:
-                        print(e)
-                        ignorechats[chat_id] = time_now+e.value+20
-                    except:
-                        pass
+                        write_log(e)
+                        ignorechats[chat_id] = time_now+e.value+30
+                    except ReactionInvalid:
+                        await app.leave_chat(chat_id)
+                    except Exception as e:
+                        write_log(e)
                 except UserBannedInChannel:
                     try:
                         await app.send_reaction(chat_id, msg_id, random.choice(cfg.reactions))
                     except FloodWait as e:
-                        print(e)
-                        ignorechats[chat_id] = time_now+e.value+20
-                    except:
-                        pass
+                        write_log(e)
+                        ignorechats[chat_id] = time_now+e.value+30
+                    except ReactionInvalid:
+                        await app.leave_chat(chat_id)
+                    except Exception as e:
+                        write_log(e)
 
 
 app.run()
