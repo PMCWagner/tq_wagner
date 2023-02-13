@@ -91,8 +91,6 @@ async def hello(client, message):
                     except FloodWait as e:
                         write_log(e)
                         ignorechats[chat_id] = time_now+e.value+30
-                    except ReactionInvalid:
-                        await app.leave_chat(chat_id)
                     except Exception as e:
                         write_log(e)
                 except UserBannedInChannel:
@@ -101,8 +99,6 @@ async def hello(client, message):
                     except FloodWait as e:
                         write_log(e)
                         ignorechats[chat_id] = time_now+e.value+30
-                    except ReactionInvalid:
-                        await app.leave_chat(chat_id)
                     except Exception as e:
                         write_log(e)
 
