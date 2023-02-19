@@ -1,4 +1,5 @@
 from pyrogram.errors import FloodWait, SlowmodeWait, ChatWriteForbidden, UserBannedInChannel, ReactionInvalid
+from pyrogram.raw.functions.messages import CheckChatInvite
 from pyrogram import Client, filters, enums
 import datetime
 import asyncio
@@ -52,12 +53,58 @@ async def hello(client, message):
         except KeyError:
             ignorechats[chat_id] = 0
         ch = random.choice(chance)
+        is_link = False
         if chat_id > 0:
+            try:
+                open_link = False
+
+                if msg[:1] == '@':
+                    lnk = msg[1:]
+                    open_link = True
+                    is_link = True
+
+                elif msg[:13] == 'https://t.me/':
+                    if msg[13:14] != '+' and msg[13:21] != 'joinchat':
+                        lnk = msg[13:]
+                        open_link = True
+                        is_link = True
+
+                if msg[13:14] == '+':
+                    lnk = msg[14:]
+                    is_link = True
+
+                if msg[13:21] == 'joinchat':
+                    lnk = msg[22:]
+                    is_link = True
+                if is_link:
+                    link = msg
+                    if open_link:
+                        s = await app.get_chat(lnk)
+                        if enums.ChatType.CHANNEL == s.type:
+                            is_channel = True
+                        else:
+                            is_channel = False
+                    else:
+                        s = await app.invoke(CheckChatInvite(hash=lnk))
+                        is_channel = s.channel
+
+                    if not open_link:
+                        lnk = link
+
+                    if is_channel:
+                        if not open_link:
+                            await app.join_chat(lnk)
+                        c = await app.get_chat(lnk)
+                        await app.join_chat(c.linked_chat.id)
+
+                    else:
+                        await app.join_chat(lnk)
+            except:
+                pass
             write_log("*"*50)
             write_log(f"Айди чата: {chat_id}")
             write_log(f"От кого: [{u_id}]({username}){first_name}")
             write_log(f"Сообщение: {msg}")
-            
         if message.reply_to_message:
             if message.reply_to_message.from_user:
                 rep_id = message.reply_to_message.from_user.id
@@ -67,7 +114,7 @@ async def hello(client, message):
                     write_log(f"Айди чата: {chat_id}")
                     write_log(f"От кого: [{u_id}]({username}){first_name}")
                     write_log(f"Сообщение: {msg}")
-        if ch == 1 and not bot and message.from_user.id not in ignoreusers and message.from_user.id > 0 and chat_id not in chats:
+        if ch == 1 and not bot and message.from_user.id not in ignoreusers and message.from_user.id > 0 and chat_id not in chats and not is_link:
             await app.read_chat_history(chat_id)
             if ignorechats[chat_id] < time_now:
                 try:
