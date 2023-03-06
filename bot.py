@@ -1,4 +1,4 @@
-from pyrogram.errors import FloodWait, SlowmodeWait, ChatWriteForbidden, UserBannedInChannel, ReactionInvalid
+from pyrogram.errors import FloodWait, SlowmodeWait, ChatWriteForbidden, UserBannedInChannel, ReactionInvalid, Forbidden
 from pyrogram.raw.functions.messages import CheckChatInvite
 from pyrogram import Client, filters, enums
 import datetime
@@ -134,6 +134,8 @@ async def hello(client, message):
                     except FloodWait as e:
                         write_log(e)
                         ignorechats[chat_id] = time_now+e.value+30
+                    except ReactionInvalid:
+                        ignorechats[chat_id] = time_now+99999999
                     except Exception as e:
                         write_log(e)
                 except UserBannedInChannel:
@@ -144,7 +146,8 @@ async def hello(client, message):
                         ignorechats[chat_id] = time_now+e.value+30
                     except Exception as e:
                         write_log(e)
-
+                except Forbidden:
+                    ignorechats[chat_id] = time_now+99999999
 
 app.run()
 
