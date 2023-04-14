@@ -105,7 +105,7 @@ async def hello(client, message):
             except:
                 pass
             write_log("*"*50)
-            write_log(f"Айди чата: {chat_id}")
+            write_log("Ответ в линчых сообщениях")
             write_log(f"От кого: [{u_id}]({username}){first_name}")
             write_log(f"Сообщение: {msg}")
         if message.reply_to_message:
