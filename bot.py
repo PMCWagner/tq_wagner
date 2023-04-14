@@ -18,11 +18,13 @@ now = datetime.datetime.now()
 n = str(now).replace(" ", "_").replace(":", "-").split(".")[0]
 log_path = f"logs/log_{n}.txt"
 
+
 def write_log(info):
     print(info)
-    f = open(log_path, "at", encoding='utf-8', errors='ignore')
-    f.write(str(info)+"\n")
-    f.close()
+    log = open(log_path, "at", encoding='utf-8', errors='ignore')
+    log.write(str(info)+"\n")
+    log.close()
+
 
 ignorechats = {}
 f = open("words.txt", encoding="utf-8", errors="ignore")
@@ -32,6 +34,7 @@ my_id = cfg.my_id
 msgs = [ms for ms in data.split("\n") if ms]
 ignoreusers = cfg.ignoreusers
 chats = cfg.chats
+
 
 @app.on_message(filters.all)
 async def hello(client, message):
@@ -57,7 +60,7 @@ async def hello(client, message):
         if chat_id > 0:
             try:
                 open_link = False
-
+                lnk = ""
                 if msg[:1] == '@':
                     lnk = msg[1:]
                     open_link = True
@@ -150,4 +153,3 @@ async def hello(client, message):
                     ignorechats[chat_id] = time_now+99999999
 
 app.run()
-
