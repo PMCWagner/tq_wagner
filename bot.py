@@ -108,15 +108,19 @@ async def hello(client, message):
             write_log("Ответ в линчых сообщениях")
             write_log(f"От кого: [{u_id}]({username}){first_name}")
             write_log(f"Сообщение: {msg}")
+        isreply = False
         if message.reply_to_message:
             if message.reply_to_message.from_user:
                 rep_id = message.reply_to_message.from_user.id
                 if rep_id == my_id:
+                    isreply = True
                     ch = 1
                     write_log("*"*50)
                     write_log(f"Айди чата: {chat_id}")
                     write_log(f"От кого: [{u_id}]({username}){first_name}")
                     write_log(f"Сообщение: {msg}")
+        if ch == 1 and not isreply and cfg.answer_only_on_replies:
+            ch = 0
         if ch == 1 and not bot and message.from_user.id not in ignoreusers and message.from_user.id > 0 and chat_id not in chats and not is_link:
             await app.read_chat_history(chat_id)
             if ignorechats[chat_id] < time_now:
@@ -124,7 +128,16 @@ async def hello(client, message):
                     await app.send_chat_action(chat_id, enums.ChatAction.TYPING)
                     await asyncio.sleep(random.randint(3, 5))
                     msg = random.choice(msgs)
-                    await app.send_message(chat_id, msg, reply_to_message_id=msg_id)
+                    if cfg.reply_only == 1:
+                        await app.send_message(chat_id, msg, reply_to_message_id=msg_id)
+                    elif cfg.reply_only == 2:
+                        reply = random.choice([True, False])
+                        if reply:
+                            await app.send_message(chat_id, msg, reply_to_message_id=msg_id)
+                        else:
+                            await app.send_message(chat_id, msg)
+                    elif cfg.reply_only == 0:
+                        await app.send_message(chat_id, msg)
                 except SlowmodeWait as e:
                     write_log(e)
                     ignorechats[chat_id] = time_now+e.value+2
