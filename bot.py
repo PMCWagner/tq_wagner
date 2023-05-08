@@ -1,7 +1,6 @@
 from pyrogram.errors import FloodWait, SlowmodeWait, ChatWriteForbidden, UserBannedInChannel, ReactionInvalid, Forbidden
 from pyrogram.raw.functions.messages import CheckChatInvite
 from pyrogram import Client, filters, enums
-import datetime
 import asyncio
 import random
 import time
@@ -14,16 +13,14 @@ app = Client(
     api_id=cfg.api_id,
     api_hash=cfg.api_hash
 )
-now = datetime.datetime.now()
-n = str(now).replace(" ", "_").replace(":", "-").split(".")[0]
-log_path = f"logs/log_{n}.txt"
 
-
-def write_log(info):
-    print(info)
-    log = open(log_path, "at", encoding='utf-8', errors='ignore')
-    log.write(str(info)+"\n")
-    log.close()
+def print_message(usr_id, usrname, frst_name, m, chat_id, msg_id):
+    print("*"*50)
+    s_chat = str(chat_id).replace('-', '').replace('100', '')
+    ms_lnk = f"https://t.me/c/{s_chat}/{msg_id}"
+    print("Ответ в сообщениях")
+    print(f"От кого: [{usr_id}]({usrname}){frst_name}")
+    print(f"Сообщение: {m}\n{ms_lnk}")
 
 
 ignorechats = {}
@@ -104,10 +101,7 @@ async def hello(client, message):
                         await app.join_chat(lnk)
             except:
                 pass
-            write_log("*"*50)
-            write_log("Ответ в линчых сообщениях")
-            write_log(f"От кого: [{u_id}]({username}){first_name}")
-            write_log(f"Сообщение: {msg}")
+            print_message(u_id, username, first_name, msg, chat_id, msg_id)
         isreply = False
         if message.reply_to_message:
             if message.reply_to_message.from_user:
@@ -115,10 +109,11 @@ async def hello(client, message):
                 if rep_id == my_id:
                     isreply = True
                     ch = 1
-                    write_log("*"*50)
-                    write_log(f"Айди чата: {chat_id}")
-                    write_log(f"От кого: [{u_id}]({username}){first_name}")
-                    write_log(f"Сообщение: {msg}")
+                    if chat_id < 0:
+                        print_message(u_id, username, first_name, msg, chat_id, msg_id)
+        if not cfg.send_pm:
+            if chat_id > 0:
+                ch = 0
         if ch == 1 and not isreply and cfg.answer_only_on_replies:
             ch = 0
         if ch == 1 and not bot and message.from_user.id not in ignoreusers and message.from_user.id > 0 and chat_id not in chats and not is_link:
@@ -139,30 +134,45 @@ async def hello(client, message):
                     elif cfg.reply_only == 0:
                         await app.send_message(chat_id, msg)
                 except SlowmodeWait as e:
-                    write_log(e)
+                    print(e)
                     ignorechats[chat_id] = time_now+e.value+2
                 except FloodWait as e:
-                    write_log(e)
+                    print(e)
                     ignorechats[chat_id] = time_now+e.value+2
                 except ChatWriteForbidden:
-                    try:
-                        await app.send_reaction(chat_id, msg_id, random.choice(cfg.reactions))
-                    except FloodWait as e:
-                        write_log(e)
-                        ignorechats[chat_id] = time_now+e.value+30
-                    except ReactionInvalid:
-                        ignorechats[chat_id] = time_now+99999999
-                    except Exception as e:
-                        write_log(e)
+                    if not cfg.chat_leave:
+                        try:
+                            await app.send_reaction(chat_id, msg_id, random.choice(cfg.reactions))
+                        except FloodWait as e:
+                            ignorechats[chat_id] = time_now+e.value+30
+                        except:
+                            pass
+                    else:
+                        try:
+                            await app.leave_chat(chat_id)
+                        except UserNotParticipant:
+                            ignorechats[chat_id] = time_now+99999999
                 except UserBannedInChannel:
                     try:
                         await app.send_reaction(chat_id, msg_id, random.choice(cfg.reactions))
                     except FloodWait as e:
-                        write_log(e)
+                        print(e)
                         ignorechats[chat_id] = time_now+e.value+30
                     except Exception as e:
-                        write_log(e)
+                        print(e)
                 except Forbidden:
-                    ignorechats[chat_id] = time_now+99999999
+                    if not cfg.chat_leave:
+                        try:
+                            await app.send_reaction(chat_id, msg_id, random.choice(cfg.reactions))
+                        except FloodWait as e:
+                            ignorechats[chat_id] = time_now+e.value+30
+                        except:
+                            pass
+                    else:
+                        try:
+                            print(1)
+                            await app.leave_chat(chat_id)
+                        except UserNotParticipant:
+                            ignorechats[chat_id] = time_now+99999999
 
 app.run()
