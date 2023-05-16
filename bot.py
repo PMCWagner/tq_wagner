@@ -104,13 +104,12 @@ async def hello(client, message):
             print_message(u_id, username, first_name, msg, chat_id, msg_id)
         isreply = False
         if message.reply_to_message:
-            if message.reply_to_message.from_user:
-                rep_id = message.reply_to_message.from_user.id
-                if rep_id == my_id:
-                    isreply = True
-                    ch = 1
-                    if chat_id < 0:
-                        print_message(u_id, username, first_name, msg, chat_id, msg_id)
+            rep_id = message.reply_to_message.from_user.id
+            if rep_id == my_id:
+                isreply = True
+                ch = 1
+                if chat_id < 0:
+                    print_message(u_id, username, first_name, msg, chat_id, msg_id)
         if not cfg.send_pm:
             if chat_id > 0:
                 ch = 0
