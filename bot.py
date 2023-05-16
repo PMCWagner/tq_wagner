@@ -37,11 +37,11 @@ chats = cfg.chats
 async def hello(client, message):
     msg_id = message.id
     user = message.from_user
-    if user:
-        try:
-            bot = message.from_user.is_bot
-        except:
-            bot = False
+    try:
+        bot = message.from_user.is_bot
+    except:
+        bot = False
+    if user and not bot:
         time_now = int(time.time())
         u_id = user.id
         first_name = user.first_name
@@ -116,7 +116,7 @@ async def hello(client, message):
                 ch = 0
         if ch == 1 and not isreply and cfg.answer_only_on_replies:
             ch = 0
-        if ch == 1 and not bot and message.from_user.id not in ignoreusers and message.from_user.id > 0 and chat_id not in chats and not is_link:
+        if ch == 1 and u_id not in ignoreusers and chat_id not in chats:
             await app.read_chat_history(chat_id)
             if ignorechats[chat_id] < time_now:
                 try:
