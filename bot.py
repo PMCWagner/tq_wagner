@@ -74,16 +74,16 @@ async def hello(client, message):
         u_id = user.id
         first_name = user.first_name
         username = user.username
-        msg = message.text
         is_link = False
         if chat_id > 0:
             if not cfg.send_pm:
                 ch = 0
-            await chat_join(client, msg)
-            print_message(u_id, username, first_name, msg, chat_id, msg_id)
+            if message.text:
+                await chat_join(client, message.text)
+            print_message(u_id, username, first_name, message.text, chat_id, msg_id)
         if message.mentioned:
             ch = 1
-            print_message(u_id, username, first_name, msg, chat_id, msg_id)
+            print_message(u_id, username, first_name, message.text, chat_id, msg_id)
         if ch == 1 and u_id not in cfg.ignoreusers and chat_id not in cfg.ignorechats and ignorechats[chat_id] < time_now:
             ignorechats[chat_id] = time_now
             try:
