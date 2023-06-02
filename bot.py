@@ -34,24 +34,29 @@ async def chat_join(client, msg):
             open_link = True
         is_link = True
     if is_link:
-        if open_link:
-            s = await client.get_chat(msg)
-            if enums.ChatType.CHANNEL == s.type:
-                is_channel = True
-        else:
-            s = await client.invoke(CheckChatInvite(hash=msg[14:]))
-            is_channel = s.channel
-
-        if is_channel:
-            if not open_link:
-                f = await client.join_chat(msg)
-                g_chat_data = f.id
+        try:
+            if open_link:
+                s = await client.get_chat(msg)
+                if enums.ChatType.CHANNEL == s.type:
+                    is_channel = True
             else:
-                g_chat_data = msg
-            c = await client.get_chat(g_chat_data)
-            await client.join_chat(c.linked_chat.id)
-        else:
-            await client.join_chat(msg)
+                s = await client.invoke(CheckChatInvite(hash=msg[14:]))
+                is_channel = s.channel
+        except:
+            pass
+        try:
+            if is_channel:
+                if not open_link:
+                    f = await client.join_chat(msg)
+                    g_chat_data = f.id
+                else:
+                    g_chat_data = msg
+                c = await client.get_chat(g_chat_data)
+                await client.join_chat(c.linked_chat.id)
+            else:
+                await client.join_chat(msg)
+        except:
+            pass
 
 
 @app.on_message(filters.all)
@@ -74,7 +79,6 @@ async def hello(client, message):
         u_id = user.id
         first_name = user.first_name
         username = user.username
-        is_link = False
         if chat_id > 0:
             if not cfg.send_pm:
                 ch = 0
@@ -94,7 +98,10 @@ async def hello(client, message):
                 await client.send_message(chat_id, msg, reply_to_message_id=msg_id)
             except ChatWriteForbidden:
                 if not cfg.chat_leave:
-                    await client.send_reaction(chat_id, msg_id, random.choice(cfg.reactions))
+                    try:
+                        await client.send_reaction(chat_id, msg_id, random.choice(cfg.reactions))
+                    except:
+                        ignorechats[chat_id] += 300
                 else:
                     await client.leave_chat(chat_id)
             except SlowmodeWait as e:
