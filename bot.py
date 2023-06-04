@@ -1,7 +1,6 @@
 from pyrogram.errors import FloodWait, SlowmodeWait, ChatWriteForbidden
 from pyrogram.raw.functions.messages import CheckChatInvite
 from pyrogram import Client, filters, enums
-from importlib import reload
 import random
 import time
 import cfg
@@ -60,7 +59,6 @@ async def chat_join(client, msg):
 
 @app.on_message(filters.all)
 async def hello(client, message):
-    reload(cfg)
     msg_id = message.id
     user = message.from_user
     chat_id = message.chat.id
