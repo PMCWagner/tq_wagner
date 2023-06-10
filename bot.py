@@ -108,6 +108,6 @@ async def hello(client, message):
                 print(e)
                 ignorechats[chat_id] += e.value+2
             except:
-                ignorechats[chat_id] += 300
+                ignorechats[chat_id] += 99999999
 
 app.run()
