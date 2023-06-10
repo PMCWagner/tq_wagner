@@ -87,6 +87,9 @@ async def hello(client, message):
             print_message(u_id, username, first_name, message.text, chat_id, msg_id)
         if ch == 1 and u_id not in cfg.ignoreusers and chat_id not in cfg.ignorechats and ignorechats[chat_id] < time_now:
             ignorechats[chat_id] = time_now
+            await client.read_chat_history(chat_id)
+            await client.send_chat_action(chat_id, enums.ChatAction.TYPING)
+            time.sleep(random.randint(5, 7))
             try:
                 msg = random.choice(msgs)
                 await client.send_message(chat_id, msg, reply_to_message_id=msg_id)
