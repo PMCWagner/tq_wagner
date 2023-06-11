@@ -1,6 +1,7 @@
 from pyrogram.errors import FloodWait, SlowmodeWait, ChatWriteForbidden
 from pyrogram.raw.functions.messages import CheckChatInvite
 from pyrogram import Client, filters, enums
+import asyncio
 import random
 import time
 import cfg
@@ -89,7 +90,7 @@ async def hello(client, message):
             ignorechats[chat_id] = time_now
             await client.read_chat_history(chat_id)
             await client.send_chat_action(chat_id, enums.ChatAction.TYPING)
-            time.sleep(random.randint(5, 7))
+            asyncio.sleep(random.randint(5, 7))
             try:
                 msg = random.choice(msgs)
                 await client.send_message(chat_id, msg, reply_to_message_id=msg_id)
