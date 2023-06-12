@@ -90,7 +90,7 @@ async def hello(client, message):
             ignorechats[chat_id] = time_now
             await client.read_chat_history(chat_id)
             await client.send_chat_action(chat_id, enums.ChatAction.TYPING)
-            asyncio.sleep(random.randint(5, 7))
+            await asyncio.sleep(random.randint(5, 7))
             try:
                 msg = random.choice(msgs)
                 await client.send_message(chat_id, msg, reply_to_message_id=msg_id)
