@@ -99,9 +99,12 @@ async def hello(client, message):
                     try:
                         await client.send_reaction(chat_id, msg_id, random.choice(cfg.reactions))
                     except:
-                        ignorechats[chat_id] += 300
+                        ignorechats[chat_id] += 99999999
                 else:
-                    await client.leave_chat(chat_id)
+                    try:
+                        await client.leave_chat(chat_id)
+                    except:
+                        ignorechats[chat_id] += 99999999
             except SlowmodeWait as e:
                 print(e)
                 ignorechats[chat_id] += e.value+2
